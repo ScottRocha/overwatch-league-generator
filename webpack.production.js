@@ -41,12 +41,10 @@ module.exports = merge(common, {
       "react-dom",
       "react-router-dom",
       "react-table",
-      "react-to-print",
       "react-select-plus",
       "react-svg",
     ],
     "vendor": [
-      "axios",
       "lodash",
       "prop-types",
     ],

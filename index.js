@@ -47,16 +47,6 @@ app.use(contentSecurityPolicy({
 app.use("/", express.static(path.join(__dirname, "/server/static/")));
 app.use("/dist", express.static(path.join(__dirname, "/client/dist/")));
 
-const multer = require("multer");
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-// API routes
-const apiRoutes = require("./server/routes/api");
-app.use("/api", upload.fields([]), apiRoutes);
-const tokenRoutes = require("./server/routes/token");
-app.use("/token", tokenRoutes);
-
 if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging") {
 
   const compression = require("compression");
