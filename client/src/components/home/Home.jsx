@@ -24,6 +24,7 @@ const teamOptions = [
   { "value": { "file": "houston-outlaws", "name": "Houston Outlaws" } },
   { "value": { "file": "london-spitfire", "name": "London Spitfire" } },
   { "value": { "file": "los-angeles-gladiators", "name": "Los Angeles Gladiators" } },
+  { "value": { "file": "los-angeles-valiant", "name": "Los Angeles Valiant" } },
   { "value": { "file": "new-york-excelsior", "name": "New-York Excelsior" } },
   { "value": { "file": "philadelphia-fusion", "name": "Philadelphia Fusion" } },
   { "value": { "file": "san-francisco-shock", "name": "San Francisco Shock" } },
