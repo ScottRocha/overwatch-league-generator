@@ -34,7 +34,6 @@ module.exports = merge(common, {
     "bundle": path.join(__dirname, "/client/src/app.jsx"),
     "material": [
       "material-ui",
-      "material-ui-icons",
     ],
     "react": [
       "react",
