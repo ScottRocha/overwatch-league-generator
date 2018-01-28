@@ -1,63 +1,126 @@
 import React from "react";
 import PropTypes from "prop-types";
+
 import PrintTemplate from "react-print";
 
-import ReactSVG from "react-svg";
 
-import Divider from "material-ui/Divider";
-import Grid from "material-ui/Grid";
-import Table, { TableBody, TableCell, TableHead, TableRow } from "material-ui/Table";
+const MatchupRows = ({ weekIndex, dayIndex, day }) => {
 
-const Print = ({ leagueName, days }) => (
+  const printMatchups = [];
+
+  printMatchups.push(
+    <th key={"week-" + weekIndex + "-day-" + dayIndex + "-matchup-day-print"}>
+      Day {dayIndex + 1}
+      <br />
+      {day.date.format("L")}
+    </th>
+  );
+
+  printMatchups.push(<th key={"week-" + weekIndex + "-day-" + dayIndex + "-matchup-blank-print"}/>);
+
+  for (let matchup = 0; matchup < 3; matchup++) {
+
+    if (day.matchups[matchup]) {
+
+      printMatchups.push(
+        <th key={"week-" + weekIndex + "-day-" + dayIndex + "-matchup-" + matchup + "-print"} style={{ "width": "125px" }}>
+          <div style={{
+            "display": "inline-block",
+            "verticalAlign": "middle",
+          }}>
+            {day.matchups[matchup].firstTeam ? <img src={"/images/medium/" + day.matchups[matchup].firstTeam.value.file + ".svg"} /> : <div />}
+          </div>
+          <div style={{
+            "display": "inline-block",
+            "verticalAlign": "middle",
+          }}>
+            {day.matchups[matchup].secondTeam ? <img src={"/images/medium/" + day.matchups[matchup].secondTeam.value.file + ".svg"} /> : <div />}
+          </div>
+        </th>
+      );
+
+    } else {
+
+      printMatchups.push(<th key={"week-" + weekIndex + "-day-" + dayIndex + "-matchup-" + matchup + "-print"} style={{ "width": "125px" }} />);
+
+    }
+
+  }
+
+  return printMatchups;
+
+};
+
+const PlayerRows = ({ weekIndex, dayIndex, players }) => {
+
+  const printPlayers = [];
+
+  for (let player = 0; player < 6; player++) {
+
+    printPlayers.push(
+      <tr key={"week-" + weekIndex + "-day-" + dayIndex + "-player-" + player + "-print"}>
+        <td />
+        <td>{players[player] ? players[player].label : ""}</td>
+        <td />
+        <td />
+        <td />
+      </tr>
+    );
+
+  }
+
+  printPlayers.push(
+    <tr key={"week-" + weekIndex + "-day-" + dayIndex + "-player-final-print"}>
+      <td />
+      <td><b>FINAL</b></td>
+      <td />
+      <td />
+      <td />
+    </tr>
+  );
+
+  return printPlayers;
+
+};
+
+const Print = ({ leagueName, weeks }) => (
+
   <PrintTemplate>
-    <div style={{ "width": "100%", "height": "100%" }}>
-      <h2 className={"centered"}>OverWatch League - {leagueName}</h2>
 
-      {days.map((day, dayIndex) => (
+    {weeks.map((week, weekIndex) => (
 
-        <Table key={"day-" + dayIndex + "-print"}>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                Day {dayIndex}
-              </TableCell>
-              <TableCell>
+      <div key={"week-" + weekIndex + "-print"} className={weeks.length !== weekIndex + 1 ? "page-break" : ""} style={{ "margin": "0", "padding": "0" }}>
+        <h2 className={"centered"}>OverWatch League - {leagueName}</h2>
+        <h3 className={"centered"}>{week.date.format("L")}</h3>
 
-              </TableCell>
+        {week.days.map((day, dayIndex) => (
 
-              {day.matchups.map((matchup, matchupIndex) => (
-                <TableCell key={"day-" + dayIndex + "-matchup-" + matchupIndex + "-print"}>
-                  {matchup[0].value.name} - {matchup[1].value.name}
-                </TableCell>
-              ))}
+          <table className="day-table" key={"week-" + weekIndex + "-day-" + dayIndex + "-print"} style={{ "width": "100%", "margin": "0", "padding": "0" }}>
+            <thead>
+              <tr>
+                <MatchupRows weekIndex={weekIndex} dayIndex={dayIndex} day={day} />
+              </tr>
+            </thead>
 
-            </TableRow>
-          </TableHead>
-          <TableBody>
+            <tbody>
+              <PlayerRows weekIndex={weekIndex} dayIndex={dayIndex} players={week.players || []} />
+            </tbody>
 
-            {day.players.map((player, playerIndex) => (
-              <TableRow key={"day-" + dayIndex + "-player-" + playerIndex + "-print"}>
-                <TableCell />
-                <TableCell>
-                  {player.label}
-                </TableCell>
-                <TableCell/>
-                <TableCell/>
-                <TableCell/>
-              </TableRow>
-            ))}
+          </table>
 
-          </TableBody>
-        </Table>
+        ))}
 
-      ))}
-    </div>
+      </div>
+
+    ))}
+
   </PrintTemplate>
+
 );
 
 Print.propTypes = {
   "leagueName": PropTypes.string.isRequired,
-  "days": PropTypes.array.isRequired,
+  "weeks": PropTypes.array.isRequired,
 };
 
 export default Print;

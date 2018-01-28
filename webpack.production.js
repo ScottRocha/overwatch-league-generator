@@ -34,6 +34,7 @@ module.exports = merge(common, {
     "bundle": path.join(__dirname, "/client/src/app.jsx"),
     "material": [
       "material-ui",
+      "material-ui-pickers",
     ],
     "react": [
       "react",
@@ -42,7 +43,6 @@ module.exports = merge(common, {
       "react-router-dom",
       "react-table",
       "react-select-plus",
-      "react-svg",
     ],
     "vendor": [
       "lodash",

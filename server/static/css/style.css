@@ -19,3 +19,38 @@
     position: relative !important;
     height: 160px;
 }
+
+.day-table {
+    border-collapse: collapse;
+}
+
+.day-table th:nth-child(n+3) {
+    border-bottom: 2px solid black;
+}
+
+.day-table td {
+    height: 20px;
+    width: 125px;
+}
+
+.day-table tbody td:nth-child(2) {
+    width: 100px;
+    border-bottom: 1px solid black;
+}
+
+.day-table td:nth-child(n+3):nth-last-child(n+2) {
+    border: 1px solid black;
+}
+
+.day-table td:nth-child(5) {
+    border-bottom: 1px solid black;
+}
+
+.day-table tbody tr:last-child td {
+    border-bottom: 1px none black !important;
+}
+
+.page-break	{
+    -webkit-region-break-after: always;
+    page-break-after: always;
+}

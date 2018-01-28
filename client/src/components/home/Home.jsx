@@ -1,9 +1,9 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import ReactTable from "react-table";
 import Select from "react-select-plus";
 
+import { DatePicker } from "material-ui-pickers";
 import DocumentTitle from "react-document-title";
 
 import Button from "material-ui/Button";
@@ -15,7 +15,7 @@ import TextField from "material-ui/TextField";
 
 import TeamOptionRenderer from "../../containers/team/TeamOptionRenderer";
 import TeamValueRenderer from "../../containers/team/TeamValueRenderer";
-import TemplatePrint from "../TemplatePrint";
+
 
 const teamOptions = [
   { "value": { "file": "boston-uprising", "name": "Boston Uprising" } },
@@ -33,8 +33,8 @@ const teamOptions = [
 ];
 
 const Home = ({
-  leagueName, days, printed, expanded, onChangeLeagueName, onAddDay, onRemoveDay,
-  onChangePlayers, onAddMatchup, onChangeMatchup, onRemoveMatchup, onPrint, onExpandedChange,
+  leagueName, weeks, printed, expanded, onChangeLeagueName, onAddWeek, onRemoveWeek, onChangeWeekDate, onChangePlayers,
+  onAddDay, onRemoveDay, onChangeDate, onAddMatchup, onChangeMatchup, onRemoveMatchup, onPrint, onExpandedChange,
 }) => (
   <DocumentTitle title={"Home - OverWatch League Generator"}>
     <div>
@@ -59,35 +59,48 @@ const Home = ({
               </div>
               <ReactTable
                 manual
-                data={days}
+                data={weeks}
                 columns={[ {
-                  "Header": "Day",
+                  "Header": "Week",
                   "Cell": (row) => row.index + 1,
                   "maxWidth": 50,
+                }, {
+                  "Header": "Week Start Date",
+                  "Cell": (row) => (
+                    <DatePicker
+                      value={row.original.date}
+                      onChange={(value) => onChangeWeekDate(row.index, value)}
+                    />
+                  ),
+                  "maxWidth": 200,
                 }, {
                   "Header": "Players",
                   "Cell": (row) => (
                     <Select.Creatable
                       multi
-                      isValidNewOption={(option) => {
-
-                        return option.label && row.original.players.length !== 6;
-
-                      }}
+                      isValidNewOption={(option) => option.label && row.original.players.length !== 6}
                       options={[ { "label": "Mike", "value": "Mike" }, { "label": "Kat", "value": "Kat" }, { "label": "Joey", "value": "Joey" } ]}
                       onChange={(players) => onChangePlayers(row.index, players)}
                       value={row.original.players}
                     />
                   ),
                 }, {
-                  "Header": () => (
-                    <Button disabled={days.length === 4} raised color="primary" style={{ "width": "100%" }} onClick={() => onAddDay()}>
+                  "Header": () => <div />,
+                  "Cell": (row) => (
+                    <Button raised disabled={row.original.days.length === 4} color="primary" style={{ "width": "100%" }} onClick={() => onAddDay(row.index)}>
                       Add Day
                     </Button>
                   ),
+                  "maxWidth": 200,
+                }, {
+                  "Header": () => (
+                    <Button raised color="primary" style={{ "width": "100%" }} onClick={() => onAddWeek()}>
+                      Add Week
+                    </Button>
+                  ),
                   "Cell": (row) => (
-                    <Button raised color="accent" style={{ "width": "100%" }} onClick={() => onRemoveDay(row.index)}>
-                      Remove Day
+                    <Button raised color="secondary" style={{ "width": "100%" }} onClick={() => onRemoveWeek(row.index)}>
+                      Remove Week
                     </Button>
                   ),
                   "maxWidth": 200,
@@ -100,53 +113,76 @@ const Home = ({
                 }}
                 SubComponent={(row) => (
 
-                  <Table style={{ "textAlign": "center" }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ "width": "50px" }}>Order</TableCell>
-                        <TableCell>Team 1</TableCell>
-                        <TableCell>Team 2</TableCell>
-                        <TableCell style={{ "width": "200px", "padding": "5px" }}>
-                          <Button disabled={row.original.matchups.length === 3} raised color="primary" style={{ "width": "100%" }} onClick={() => onAddMatchup(row.index, "", "")}>
-                            Add Matchup
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {row.original.matchups.map((matchup, matchupIndex) => (
+                  <div>
 
-                        <TableRow key={"day-" + row.index + "-matchup-" + matchupIndex}>
-                          <TableCell style={{ "width": "50px" }}>{matchupIndex + 1}</TableCell>
-                          <TableCell>
-                            <Select
-                              optionComponent={TeamOptionRenderer}
-                              valueComponent={TeamValueRenderer}
-                              options={teamOptions}
-                              onChange={(value) => onChangeMatchup(row.index, matchupIndex, value, row.original.matchups[matchupIndex][1])}
-                              value={row.original.matchups[matchupIndex][0]}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Select
-                              optionComponent={TeamOptionRenderer}
-                              valueComponent={TeamValueRenderer}
-                              options={teamOptions}
-                              onChange={(value) => onChangeMatchup(row.index, matchupIndex, row.original.matchups[matchupIndex][0], value)}
-                              value={row.original.matchups[matchupIndex][1]}
-                            />
-                          </TableCell>
-                          <TableCell style={{ "width": "200px", "padding": "5px" }}>
-                            <Button raised color="accent" style={{ "width": "100%" }} onClick={() => onRemoveMatchup(row.index, matchupIndex)}>
-                              Remove Matchup
-                            </Button>
-                          </TableCell>
-                        </TableRow>
+                    {row.original.days.map((day, dayIndex) => (
 
-                      ))}
-                    </TableBody>
-                  </Table>
+                      <Table key={"week-" + row.index + "day-" + dayIndex} style={{ "textAlign": "center" }}>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ "width": "50px" }}>Order</TableCell>
+                            <TableCell style={{ "width": "200px", "padding": "5px" }}>
+                              Day Date:
+                              <DatePicker
+                                value={day.date}
+                                onChange={(value) => onChangeDate(row.index, dayIndex, value)}
+                              />
+                            </TableCell>
+                            <TableCell style={{ "width": "250px", "padding": "5px" }}>Team 1</TableCell>
+                            <TableCell style={{ "width": "250px", "padding": "5px" }}>Team 2</TableCell>
+                            <TableCell style={{ "width": "200px", "padding": "5px" }}>
+                              <Button raised color="secondary" style={{ "width": "100%" }} onClick={() => onRemoveDay(row.index, dayIndex)}>
+                                Remove Day
+                              </Button>
+                            </TableCell>
+                            <TableCell style={{ "width": "200px", "padding": "5px" }}>
+                              <Button disabled={day.matchups.length === 3} raised color="primary" style={{ "width": "100%" }} onClick={() => onAddMatchup(row.index, dayIndex, "", "")}>
+                                Add Matchup
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
 
+                          {day.matchups.map((matchup, matchupIndex) => (
+
+                            <TableRow key={"week-" + row.index + "day-" + dayIndex + "-matchup-" + matchupIndex}>
+                              <TableCell style={{ "width": "50px" }}>{matchupIndex + 1}</TableCell>
+                              <TableCell style={{ "width": "200px", "padding": "5px" }} />
+                              <TableCell style={{ "width": "250px", "padding": "5px" }}>
+                                <Select
+                                  optionComponent={TeamOptionRenderer}
+                                  valueComponent={TeamValueRenderer}
+                                  options={teamOptions}
+                                  onChange={(value) => onChangeMatchup(row.index, dayIndex, matchupIndex, value, day.matchups[matchupIndex].secondTeam)}
+                                  value={day.matchups[matchupIndex].firstTeam}
+                                />
+                              </TableCell>
+                              <TableCell style={{ "width": "250px", "padding": "5px" }}>
+                                <Select
+                                  optionComponent={TeamOptionRenderer}
+                                  valueComponent={TeamValueRenderer}
+                                  options={teamOptions}
+                                  onChange={(value) => onChangeMatchup(row.index, dayIndex, matchupIndex,day.matchups[matchupIndex].firstTeam, value)}
+                                  value={day.matchups[matchupIndex].secondTeam}
+                                />
+                              </TableCell>
+                              <TableCell style={{ "width": "200px", "padding": "5px" }} />
+                              <TableCell style={{ "width": "200px", "padding": "5px" }}>
+                                <Button raised color="secondary" style={{ "width": "100%" }} onClick={() => onRemoveMatchup(row.index, dayIndex, matchupIndex)}>
+                                  Remove Matchup
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+
+                          ))}
+
+                        </TableBody>
+                      </Table>
+
+                    ))}
+
+                  </div>
                 )}
                 filterable={false}
                 sortable={false}
@@ -155,28 +191,30 @@ const Home = ({
             </CardContent>
             <Divider />
             <CardActions>
-              <Button raised color="accent" onClick={onPrint}>
+              <Button raised color="secondary" onClick={onPrint}>
                 Print / Download
               </Button>
             </CardActions>
           </Card>
         </Grid>
       </Grid>
-      {ReactDOM.render(<TemplatePrint leagueName={leagueName} days={days} />, document.getElementById("print-mount"))}
     </div>
   </DocumentTitle>
 );
 
 Home.propTypes = {
   "leagueName": PropTypes.string.isRequired,
-  "days": PropTypes.array.isRequired,
+  "weeks": PropTypes.array.isRequired,
   "printed": PropTypes.bool.isRequired,
   "expanded": PropTypes.object.isRequired,
   "onChangeLeagueName": PropTypes.func.isRequired,
+  "onAddWeek": PropTypes.func.isRequired,
+  "onRemoveWeek": PropTypes.func.isRequired,
+  "onChangeWeekDate": PropTypes.func.isRequired,
+  "onChangePlayers": PropTypes.func.isRequired,
   "onAddDay": PropTypes.func.isRequired,
   "onRemoveDay": PropTypes.func.isRequired,
-  "onAddPlayer": PropTypes.func.isRequired,
-  "onChangePlayers": PropTypes.func.isRequired,
+  "onChangeDate": PropTypes.func.isRequired,
   "onAddMatchup": PropTypes.func.isRequired,
   "onChangeMatchup": PropTypes.func.isRequired,
   "onRemoveMatchup": PropTypes.func.isRequired,

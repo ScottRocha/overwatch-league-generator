@@ -1,8 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import ReactSVG from "react-svg";
-
 
 class TeamValueRendererPage extends React.Component {
 
@@ -22,7 +20,7 @@ class TeamValueRendererPage extends React.Component {
             "marginRight": 10,
             "verticalAlign": "middle",
           }}>
-            <ReactSVG path={"/images/" + this.props.value.value.file + ".svg"} style={{ "width": "15", "height": "15" }} />
+            <img src={"/images/small/" + this.props.value.value.file + ".svg"} />
           </div>
           <span>{this.props.value.value.name}</span>
           {this.props.children}
